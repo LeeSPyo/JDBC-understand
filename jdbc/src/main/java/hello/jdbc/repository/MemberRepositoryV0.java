@@ -12,17 +12,17 @@ import hello.jdbc.domain.Member;
 import lombok.extern.slf4j.Slf4j;
 
 /**
-* JDBC - DriverManager 사용
-*/
+ * JDBC - DriverManager 사용
+ */
 @Slf4j
 public class MemberRepositoryV0 {
-	
-	public Member save(Member member) throws SQLException{
+
+	public Member save(Member member) throws SQLException {
 		String sql = "insert into member(member_id, money) values(?, ?)";
-		
+
 		Connection con = null;
 		PreparedStatement pstmt = null;
-		
+
 		try {
 			con = getConnection();
 			pstmt = con.prepareStatement(sql);
@@ -30,31 +30,31 @@ public class MemberRepositoryV0 {
 			pstmt.setInt(2, member.getMoney());
 			pstmt.executeUpdate();
 			return member;
-			
+
 		} catch (SQLException e) {
 			log.error("db error", e);
 			throw e;
 		} finally {
 			close(con, pstmt, null);
 		}
-				
+
 	}
 
 	public Member findById(String memberId) throws SQLException {
-		
+
 		String sql = "select * from member where member_id = ?";
-		
+
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
+
 		try {
 			con = getConnection();
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, memberId);
-			
+
 			rs = pstmt.executeQuery();
-			if(rs.next()) {
+			if (rs.next()) {
 				Member member = new Member();
 				member.setMemberId(rs.getString("memberId"));
 				member.setMoney(rs.getInt("money"));
@@ -62,16 +62,56 @@ public class MemberRepositoryV0 {
 			} else {
 				throw new NoSuchElementException("member not found memberId =" + memberId);
 			}
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			log.error("db error", e);
 			throw e;
 		} finally {
 			close(con, pstmt, rs);
 		}
 	}
-	
-	private void close(Connection con, Statement stmt, ResultSet rs) {
+
+	public void update(String memberId, int money) throws SQLException {
+
+		String sql = "update member set money=? where member_id=?";
+		Connection con = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, money);
+			pstmt.setString(2, memberId);
+			int resultSize = pstmt.executeUpdate();
+			log.info("resultSize={}", resultSize);
+		} catch (SQLException e) {
+			log.error("db error", e);
+			throw e;
+		} finally {
+			close(con, pstmt, null);
+		}
+	}
+
+	public void delete(String memberId) throws SQLException {
 		
+		String sql = "delete from member where member_id=?";
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, memberId);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			log.error("db error", e);
+			throw e;
+		} finally {
+			close(con, pstmt, null);
+		}
+	}
+
+	private void close(Connection con, Statement stmt, ResultSet rs) {
+
 		if (rs != null) {
 			try {
 				rs.close();
@@ -79,16 +119,16 @@ public class MemberRepositoryV0 {
 				log.info("error", e);
 			}
 		}
-		
-		if(stmt != null) {
+
+		if (stmt != null) {
 			try {
 				stmt.close();
 			} catch (SQLException e) {
 				log.info("error", e);
 			}
 		}
-		
-		if(con != null) {
+
+		if (con != null) {
 			try {
 				con.close();
 			} catch (SQLException e) {
@@ -96,7 +136,7 @@ public class MemberRepositoryV0 {
 			}
 		}
 	}
-	
+
 	private Connection getConnection() {
 		return DBConnectionUtil.getConnection();
 	}
