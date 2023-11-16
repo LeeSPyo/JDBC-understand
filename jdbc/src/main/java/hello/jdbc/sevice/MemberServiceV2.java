@@ -10,9 +10,6 @@ import hello.jdbc.repository.MemberRepositoryV2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * 트랜잭션 - 파라미터 연동, 풀을 고려한 종료
- */
 @Slf4j
 @RequiredArgsConstructor
 public class MemberServiceV2 {
@@ -23,7 +20,7 @@ public class MemberServiceV2 {
 		Connection con = dataSource.getConnection();
 		try {
 			con.setAutoCommit(false); // 트랜잭션 시작
-//비즈니스 로직
+			//비즈니스 로직
 			bizLogic(con, fromId, toId, money);
 			con.commit(); // 성공시 커밋
 		} catch (Exception e) {
@@ -38,7 +35,6 @@ public class MemberServiceV2 {
 		Member fromMember = memberRepository.findById(con, fromId);
 		Member toMember = memberRepository.findById(con, toId);
 		memberRepository.update(con, fromId, fromMember.getMoney() - money);
-		validation(toMember);
 		memberRepository.update(con, toId, toMember.getMoney() + money);
 	}
 
