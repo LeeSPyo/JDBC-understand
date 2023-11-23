@@ -30,7 +30,8 @@ public class UncheckedTest {
 	}
 
 	/**
-	 * UnChecked 예외는 예외를 잡거나, 던지지 않아도 된다. 예외를 잡지 않으면 자동으로 밖으로 던진다.
+	 * UnChecked 예외는 예외를 잡거나, 던지지 않아도 된다. 
+	 * 예외를 잡지 않으면 자동으로 밖으로 던진다.
 	 */
 	static class Service {
 		Repository repository = new Repository();
